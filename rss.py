@@ -36,7 +36,7 @@ class Entry:
 
         return updated_obj
 
-    # Splits the description into a dictionary of fields and assigns variables for the object
+    # Splits the description into a dictionary
     # Gets called when the object is created.
     @staticmethod
     def splitDesc(desc):
@@ -45,7 +45,7 @@ class Entry:
         desc_dict["Departure"] = desc_dict["Departure"][:-7] #because of a pesky regex thing
         return desc_dict
 
-    # Returns string
+    # Returns string of category name
     def getCategory(self):
         return self.category_name
 
@@ -53,7 +53,7 @@ class Entry:
     def getDateTime(self):
         return self.occured_on
 
-    # Returns string
+    # Returns string of formatted description
     def getDescription(self):
         return "Visible for: " + self.duration + ", Arrival: " + self.approach + ", Departure: " + self.departure
 
