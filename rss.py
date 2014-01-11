@@ -11,12 +11,13 @@ from time import strptime
 
 # Individual RSS entry
 class Entry:
-    def __init__(self, title, desc):
+    def __init__(self, title, desc, guid):
         desc_dict = self.splitDesc(desc)
         self.duration = desc_dict["Duration"]
         self.approach = desc_dict["Approach"]
         self.departure = desc_dict["Departure"]
         self.occured_on = self.makeDateTime(desc_dict)
+        self.guid = guid
         self.category_name = title[11:] # Where to get the category name from. In this case it's in the first 11 characters of the title.
         
 
@@ -57,6 +58,10 @@ class Entry:
     def getDescription(self):
         return "Visible for: " + self.duration + ", Arrival: " + self.approach + ", Departure: " + self.departure
 
+    # Returns string of GUID used to check for duplicates
+    def getGUID(self):
+        return self.guid
+
 # Entire RSS feed
 class Feed:
     def __init__(self, rss):
@@ -71,13 +76,13 @@ class Feed:
         for i in range(0, self.getLength()):
             title = self.rss_parsed['entries'][i]['title']
             desc = self.rss_parsed['entries'][i]['description']
+            guid = self.rss_parsed['entries'][i]['guid']
             
-            rss_obj = Entry(title, desc)
+            rss_obj = Entry(title, desc, guid)
 
-            # Checks to see if the event happens in the next half hour
-            if self.time_now <= rss_obj.getDateTime() <= (self.time_now + timedelta(hours = 0.5)):
+            # Checks to see if the event happens today
+            if rss_obj.occured_on.day == self.time_now.day:
                 # Adds the object to the list of valid entries
-                print rss_obj.getDateTime(), "happens within half an hour from now."
                 all_entries.append(rss_obj)
             
         return all_entries

@@ -5,7 +5,7 @@
 import thundermaps
 import rss
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import strptime
 
 class Updater:
@@ -16,11 +16,11 @@ class Updater:
         self.account_id = account_id
         self.categories = categories
 
-    def start (self):
+    def start (self, update_interval=-1):
         # Try to load the source_ids already posted.
         source_ids = []
         try:
-            source_ids_file = open(".source_ids_sample", "r")
+            source_ids_file = open(".source_ids_", "r")
             source_ids = [i.strip() for i in source_ids_file.readlines()]
             source_ids_file.close()
         except Exception as e:
@@ -44,20 +44,20 @@ class Updater:
                     "description": item.getDescription(),
                     }
 		# Add the report to the list of reports if it hasn't already been posted.
-		if report["occurred_on"] not in source_ids:
+		if item.getGUID() not in source_ids:
 			reports.append(report)
-		source_ids.append(report["occurred_on"])
+                        source_ids.append(item.getGUID())
 
             # If there is at least one report, send the reports to Thundermaps.
             if len(reports) > 0:
 		print "[%s] Sending %d reports to Thundermaps..." % (time.strftime("%c"), len(reports))
 		# Upload 10 at a time.
-		for some_reports in [reports[i:i+10] for i in range(0, len(reports), 10)]:
-			self.tm_obj.sendReports(self.account_id, some_reports)
+                for some_reports in [reports[i:i+10] for i in range(0, len(reports), 10)]:
+                    self.tm_obj.sendReports(self.account_id, some_reports)
 		print "* Done."
 				  
             try:
-		source_ids_file = open(".source_ids_sample", "w")
+		source_ids_file = open(".source_ids_", "w")
 		for i in source_ids:
 			source_ids_file.write("%s\n" % i)
 		source_ids_file.close()
@@ -67,7 +67,18 @@ class Updater:
 
             print "* Update completed."
 
-            # Wait half an hour before trying again.
             if reports == []:
 		print "* No new entries added."
-            time.sleep(30 * 60)
+                
+            # Waiting the update interval
+            print "Will check again in", update_interval, "hour(s)."
+            # If updating daily
+            if update_interval < 0:
+                t = time.localtime()
+                t = time.mktime(t[:3] + (0, 0, 0) + t[6:])
+                update_interval = (t + 24*3600 - time.time())
+            else:
+                # Convert hours into seconds
+                update_interval = update_interval*60*60
+
+            time.sleep(update_interval)

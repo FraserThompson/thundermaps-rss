@@ -34,16 +34,16 @@ items = feed_obj.getFeed()
 
 rss.py will have to be modified for each individual feed so that it grabs from the correct fields. The following methods will also need some modification:
 
-* getDescription() returns a description string, assembled from various fields
-* getDateTime() returns the occured_on time/date
-* getCategory() returns the category name.
+* `getDescription()` returns a description string, assembled from various fields
+* `getDateTime()` returns the occured_on time/date
+* `getCategory()` returns the category name.
 
-In NASA's feed the time entries were posted to the feed is not the same as the time they occur. To combat this rss.py checks whether RSS entries have times occurring in the next half hour and only adds those to the list. You could modify this to work with a traditional RSS feed by commenting out the if statement here:
+NASA's feed posts a big batch of events every few weeks. Rather than sending them all to Thundermaps (including ones into the past and far into the future), rss.py is currently set to send all the events which are happening today. This functionality can be changed or removed entirely in the following lines:
 
 ```python
-# Checks to see if the event happens in the next half hour
-if self.time_now <= rss_obj.getDateTime() <= (self.time_now + timedelta(hours = 0.5)):
-	# Adds the object to the list of valid entries
+# Checks to see if the event happens today
+    if rss_obj.occured_on.day == self.time_now.day:
+        # Adds the object to the list of valid entries
         all_entries.append(rss_obj)
 ```
 
@@ -67,7 +67,7 @@ reports = thundermaps.getReports(ACCOUNT_ID)
 The updater module combines both the RSS and ThunderMaps module and provides a higher level interface for generating ThunderMaps reports for the latest RSS listings. Using the updater module typically consists of these steps:
 
 * Creating a new instance of `Updater` with a ThunderMaps API key, account_id, URL of RSS feed, and a categories dictionary.
-* Starting the updater with the start() method.
+* Starting the updater with the `start()` method. You can optionally set an update_interval in hours. For example `start(1)` would set it to update every hour. By default it will update daily.
 
 An example usage is shown below.
 
@@ -87,7 +87,7 @@ rss_updater = updater.Updater(THUNDERMAPS_API_KEY, THUNDERMAPS_ACCOUNT_ID, RSS_F
 rss_updater.start()
 ```
 
-**Important:** The updater module uses `.lastupdate_` files to store the timestamp of the last update for each category. If you delete these files then it will default to generating reports from the current time.
+**Important:** The updater module uses `.source_ids_` files to store the id's of updates which have already been posted. If you delete these files then it will post duplicates.
 
 
 ## Current Usage
