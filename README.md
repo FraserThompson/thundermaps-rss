@@ -10,7 +10,7 @@ Dependencies
 
 * The `feedparser` library for Python.
 * A Thundermaps API key and account ID.
-* The URL of some RSS feed to grab from.
+* The URL of some RSS or Atom feed to grab from.
 
 Usage
 -----
@@ -94,6 +94,6 @@ rss_updater.start()
 
 ## Current Usage
 
-These modules are currently used in several Thundermaps accounts:
+These modules are currently used in this Thundermaps accounts:
 
 * [NASA ISS Sightings Wellington](http://www.thundermaps.com/accounts/gdfgsdfg)
