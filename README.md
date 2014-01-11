@@ -17,7 +17,7 @@ Usage
 
 ### RSS module
 
-To use the RSS module, import it into your code using `import rss` and create an instance of the `Feed` class with the URL of your feed, the update time and hours in advance to return as parameters. 
+To use the RSS module, import it into your code using `import rss` and create an instance of the `Feed` class with the URL of your feed and the update time as parameters. 
 
 To get a list of entries, you can use the `getFeed()` method:
 
@@ -34,7 +34,7 @@ items = feed_obj.getFeed()
 
 rss.py will have to be modified for each individual feed so that it grabs from the correct fields. The following methods will also need some modification:
 
-* getDescription() returns a description
+* getDescription() returns a description string, assembled from various fields
 * getDateTime() returns the occured_on time/date
 * getCategory() returns the category name.
 
@@ -49,7 +49,7 @@ if self.time_now <= rss_obj.getDateTime() <= (self.time_now + timedelta(hours = 
 
 ### Thundermaps module
 
-To use the Thundermaps module, import it into your code using `import thundermaps` and create an instance of the `ThunderMaps` class using your Thundermaps API key. E.g.
+To use the Thundermaps module by DanielGibbsNZ, import it into your code using `import thundermaps` and create an instance of the `ThunderMaps` class using your Thundermaps API key. E.g.
 
 ```python
 import thundermaps
@@ -63,12 +63,10 @@ my_thundermaps = thundermaps.ThunderMaps(THUNDERMAPS_API_KEY)
 reports = thundermaps.getReports(ACCOUNT_ID)
 ```
 
-**Important:** The updater module uses `.lastupdate_` files to store the timestamp of the last update for each category. If you delete these files then it will default to generating reports from the current time.
-
 ### Updater module
 The updater module combines both the RSS and ThunderMaps module and provides a higher level interface for generating ThunderMaps reports for the latest RSS listings. Using the updater module typically consists of these steps:
 
-* Creating a new instance of `Updater` with a ThunderMaps API key, account_id, URL of RSS feed, and categories dictionary.
+* Creating a new instance of `Updater` with a ThunderMaps API key, account_id, URL of RSS feed, and a categories dictionary.
 * Starting the updater with the start() method.
 
 An example usage is shown below.
@@ -77,8 +75,8 @@ An example usage is shown below.
 import updater
 
 # Key, account, categories...
-THUNDERMAPS_API_KEY = ""
-THUNDERMAPS_ACCOUNT_ID = ""
+THUNDERMAPS_API_KEY = "your api key"
+THUNDERMAPS_ACCOUNT_ID = "your account id"
 THUNDERMAPS_CATEGORY_ID = {"ISS Sighting": 11870, "CYGNUS Sighting": 11871}
 RSS_FEED_URL = 'http://spotthestation.nasa.gov/sightings/xml_files/New_Zealand_None_Wellington.xml'
 
